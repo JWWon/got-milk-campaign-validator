@@ -2,6 +2,7 @@
 
 import { NextUIProvider } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
+import QueryProvider from "@/app/_providers/QueryProvider";
 
 export default function Providers({
   children,
@@ -10,5 +11,9 @@ export default function Providers({
 }>) {
   const router = useRouter();
 
-  return <NextUIProvider navigate={router.push}>{children}</NextUIProvider>;
+  return (
+    <QueryProvider>
+      <NextUIProvider navigate={router.push}>{children}</NextUIProvider>
+    </QueryProvider>
+  );
 }
