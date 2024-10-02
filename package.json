@@ -10,12 +10,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
     "@nextui-org/button": "^2.0.38",
     "@nextui-org/input": "^2.2.5",
     "@nextui-org/modal": "^2.0.41",
     "@nextui-org/navbar": "^2.0.37",
     "@nextui-org/react": "^2.4.8",
     "@nextui-org/select": "^2.2.7",
+    "@nextui-org/skeleton": "^2.0.32",
     "@nextui-org/system": "^2.2.6",
     "@nextui-org/theme": "^2.2.11",
     "@nextui-org/use-infinite-scroll": "^2.1.5",
@@ -28,7 +30,9 @@
     "react-error-boundary": "^4.0.13",
     "react-hook-form": "^7.53.0",
     "tailwind-merge": "^2.5.2",
-    "twelvelabs-js": "^0.2.6"
+    "twelvelabs-js": "^0.2.6",
+    "yup": "^1.4.0",
+    "zustand": "5.0.0-rc.2"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",
