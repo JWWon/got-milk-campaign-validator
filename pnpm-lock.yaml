@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   twelvelabs-js:
-    hash: hindu5beixznwnltpil4tzfkbi
+    hash: 57hv6rawdci5kzp6etdgndudjm
     path: patches/twelvelabs-js.patch
 
 importers:
@@ -93,7 +93,7 @@ importers:
         version: 2.5.2
       twelvelabs-js:
         specifier: ^0.2.6
-        version: 0.2.6(patch_hash=hindu5beixznwnltpil4tzfkbi)
+        version: 0.2.6(patch_hash=57hv6rawdci5kzp6etdgndudjm)
       yup:
         specifier: ^1.4.0
         version: 1.4.0
@@ -8998,7 +8998,7 @@ snapshots:
 
   tslib@2.7.0: {}
 
-  twelvelabs-js@0.2.6(patch_hash=hindu5beixznwnltpil4tzfkbi):
+  twelvelabs-js@0.2.6(patch_hash=57hv6rawdci5kzp6etdgndudjm):
     dependencies:
       cross-fetch: 4.0.0
       form-data: 4.0.0
