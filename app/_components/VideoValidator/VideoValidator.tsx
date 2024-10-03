@@ -4,11 +4,13 @@ import { useSelectedData } from '@/app/utils/selectedVideoStore'
 import { Suspense } from 'react'
 import ReactPlayer from 'react-player'
 import type { Index, Video } from 'twelvelabs-js'
-import { differenceInSeconds, formatDistance } from 'date-fns'
-import useVideo from '../VideoSelect/hooks/useVideo'
-import VideoValidatorSkeleton from './VideoValidatorSkeleton'
+import { formatDistance } from 'date-fns'
+import useVideo from '../VideoSelect/_hooks/useVideo'
+import VideoValidatorSkeleton from './_components/VideoValidatorSkeleton'
 import HorizontalList from '@/app/components/HorizontalList'
 import formatTimestamp from '@/app/utils/formatTimestamp'
+import useInjectGistToMetadata from './_hooks/useMutateGist'
+import MetadataChips from './_components/MetadataChips'
 
 interface Props {
 	index: Index
@@ -17,6 +19,7 @@ interface Props {
 
 function VideoValidator({ index, video: { id: videoID } }: Props) {
 	const { data: video } = useVideo(index, videoID)
+	const { isLoading } = useInjectGistToMetadata(index, video)
 
 	return (
 		<div className="flex gap-x-6">
@@ -31,6 +34,14 @@ function VideoValidator({ index, video: { id: videoID } }: Props) {
 						indexing
 					</p>
 				</HorizontalList>
+				<div className="flex flex-col gap-y-2">
+					<p className="text-lg font-semibold">Topics</p>
+					<MetadataChips color="primary" isLoading={isLoading} stringifiedData={video.metadata.topics} />
+				</div>
+				<div className="flex flex-col gap-y-2">
+					<p className="text-lg font-semibold">Auto-gen hashtags</p>
+					<MetadataChips isLoading={isLoading} stringifiedData={video.metadata.hashtags} />
+				</div>
 			</div>
 			<div className="flex basis-60 flex-col gap-y-4">{/*  */}</div>
 		</div>

@@ -2,7 +2,7 @@
 
 import { Image } from '@nextui-org/image'
 import type { Index } from 'twelvelabs-js'
-import useVideo from '../hooks/useVideo'
+import useVideo from '../_hooks/useVideo'
 import { Chip } from '@nextui-org/chip'
 import { twMerge } from 'tailwind-merge'
 

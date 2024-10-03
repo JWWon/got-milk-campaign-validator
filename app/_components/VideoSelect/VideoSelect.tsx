@@ -1,12 +1,12 @@
 'use client'
 
 import { useSelectedVideoStore } from '@/app/utils/selectedVideoStore'
-import useVideos from './hooks/useVideos'
+import useVideos from './_hooks/useVideos'
 import { useShallow } from 'zustand/react/shallow'
 import type { Index } from 'twelvelabs-js'
 import { useInfiniteScroll } from '@nextui-org/use-infinite-scroll'
-import VideoItem from './components/VideoItem'
-import VideoItemSkeleton from './components/VideoItemSkeleton'
+import VideoItem from './_components/VideoItem'
+import VideoItemSkeleton from './_components/VideoItemSkeleton'
 import { RefObject, Suspense } from 'react'
 import { twMerge } from 'tailwind-merge'
 

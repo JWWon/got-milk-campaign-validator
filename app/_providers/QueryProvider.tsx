@@ -1,6 +1,6 @@
 'use client'
 
-import { isServer, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experimental'
 
 let client: QueryClient | undefined = undefined

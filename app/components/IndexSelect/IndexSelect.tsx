@@ -1,7 +1,7 @@
 'use client'
 
 import { Select, SelectItem, SelectProps } from '@nextui-org/select'
-import useIndexes from './hooks/useIndexes'
+import useIndexes from './_hooks/useIndexes'
 import { useInfiniteScroll } from '@nextui-org/use-infinite-scroll'
 import { useSelectedVideoStore } from '@/app/utils/selectedVideoStore'
 import { useShallow } from 'zustand/react/shallow'
