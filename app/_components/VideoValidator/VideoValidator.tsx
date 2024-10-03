@@ -2,9 +2,39 @@
 
 import { useSelectedData } from '@/app/utils/selectedVideoStore'
 import { Suspense } from 'react'
+import ReactPlayer from 'react-player'
+import type { Index, Video } from 'twelvelabs-js'
+import { differenceInSeconds, formatDistance } from 'date-fns'
+import useVideo from '../VideoSelect/hooks/useVideo'
+import VideoValidatorSkeleton from './VideoValidatorSkeleton'
+import HorizontalList from '@/app/components/HorizontalList'
+import formatTimestamp from '@/app/utils/formatTimestamp'
 
-function VideoValidator() {
-	return null
+interface Props {
+	index: Index
+	video: Video
+}
+
+function VideoValidator({ index, video: { id: videoID } }: Props) {
+	const { data: video } = useVideo(index, videoID)
+
+	return (
+		<div className="flex gap-x-6">
+			<div className="flex flex-1 flex-col gap-y-4">
+				<ReactPlayer controls width="100%" height="100%" url={video.hls?.videoUrl} />
+				<p className="text-xl font-bold">{video.metadata.filename}</p>
+				<HorizontalList>
+					<p>{formatTimestamp(video.metadata.duration)}</p>
+					<p>{video.metadata.height}p</p>
+					<p>
+						Takes {formatDistance(video.indexedAt ?? new Date(), video.createdAt, { includeSeconds: true })} for
+						indexing
+					</p>
+				</HorizontalList>
+			</div>
+			<div className="flex basis-60 flex-col gap-y-4">{/*  */}</div>
+		</div>
+	)
 }
 
 export default function ValidatorWithFallback() {
@@ -19,9 +49,9 @@ export default function ValidatorWithFallback() {
 	}
 
 	return (
-		<div className="h-full w-full rounded-medium border border-gray-100 py-6 shadow-lg shadow-gray-400/30 dark:bg-gray-700/20 dark:shadow-white/20">
-			<Suspense>
-				<VideoValidator />
+		<div className="h-full w-full rounded-medium border border-gray-100 p-6 shadow-lg shadow-gray-400/30 dark:bg-gray-700/20 dark:shadow-white/20">
+			<Suspense fallback={<VideoValidatorSkeleton />}>
+				<VideoValidator index={index} video={video} />
 			</Suspense>
 		</div>
 	)
