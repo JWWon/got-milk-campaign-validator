@@ -1,16 +1,18 @@
 'use client'
 
 import { useSelectedData } from '@/app/utils/selectedVideoStore'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import ReactPlayer from 'react-player'
 import type { Index, Video } from 'twelvelabs-js'
 import { formatDistance } from 'date-fns'
-import useVideo from '../VideoSelect/_hooks/useVideo'
 import VideoValidatorSkeleton from './_components/VideoValidatorSkeleton'
 import HorizontalList from '@/app/components/HorizontalList'
 import formatTimestamp from '@/app/utils/formatTimestamp'
 import useInjectGistToMetadata from './_hooks/useMutateGist'
 import MetadataChips from './_components/MetadataChips'
+import useVideo from '@/app/hooks/useVideo'
+import VideoValidatorControl, { VideoValidatorData } from './_components/VideoValidatorControl'
+import Section from './_components/Section'
 
 interface Props {
 	index: Index
@@ -19,7 +21,11 @@ interface Props {
 
 function VideoValidator({ index, video: { id: videoID } }: Props) {
 	const { data: video } = useVideo(index, videoID)
-	const { isLoading } = useInjectGistToMetadata(index, video)
+	const { isLoading: isLoadingGist } = useInjectGistToMetadata(index, video)
+
+	const [validatorData, setValidatorData] = useState<VideoValidatorData>()
+
+	console.log({ validatorData })
 
 	return (
 		<div className="flex gap-x-6">
@@ -29,21 +35,18 @@ function VideoValidator({ index, video: { id: videoID } }: Props) {
 				<HorizontalList>
 					<p>{formatTimestamp(video.metadata.duration)}</p>
 					<p>{video.metadata.height}p</p>
-					<p>
-						Takes {formatDistance(video.indexedAt ?? new Date(), video.createdAt, { includeSeconds: true })} for
-						indexing
-					</p>
+					<p>{formatDistance(video.indexedAt ?? new Date(), video.createdAt, { includeSeconds: true })} for indexing</p>
 				</HorizontalList>
-				<div className="flex flex-col gap-y-2">
-					<p className="text-lg font-semibold">Topics</p>
-					<MetadataChips color="primary" isLoading={isLoading} stringifiedData={video.metadata.topics} />
-				</div>
-				<div className="flex flex-col gap-y-2">
-					<p className="text-lg font-semibold">Auto-gen hashtags</p>
-					<MetadataChips isLoading={isLoading} stringifiedData={video.metadata.hashtags} />
-				</div>
+				<Section title="Topic">
+					<MetadataChips color="primary" isLoading={isLoadingGist} stringifiedData={video.metadata.topics} />
+				</Section>
+				<Section title="Auto-gen Hashtags">
+					<MetadataChips isLoading={isLoadingGist} stringifiedData={video.metadata.hashtags} />
+				</Section>
 			</div>
-			<div className="flex basis-60 flex-col gap-y-4">{/*  */}</div>
+			<div className="basis-60">
+				<VideoValidatorControl video={video} onSubmit={setValidatorData} />
+			</div>
 		</div>
 	)
 }

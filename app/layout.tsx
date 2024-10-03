@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import Providers from './providers'
+import { ToastContainer } from 'react-toastify'
 
+import 'react-toastify/dist/ReactToastify.min.css'
 import './globals.css'
 import Navbar from './components/Navbar'
 
@@ -30,6 +32,7 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<Providers>
+					<ToastContainer />
 					<div className="flex min-h-screen flex-col bg-background text-foreground">
 						<Navbar />
 						{children}

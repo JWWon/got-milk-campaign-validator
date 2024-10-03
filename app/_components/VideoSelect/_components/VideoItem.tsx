@@ -2,9 +2,9 @@
 
 import { Image } from '@nextui-org/image'
 import type { Index } from 'twelvelabs-js'
-import useVideo from '../_hooks/useVideo'
 import { Chip } from '@nextui-org/chip'
 import { twMerge } from 'tailwind-merge'
+import useVideo from '@/app/hooks/useVideo'
 
 interface Props extends React.HTMLAttributes<HTMLButtonElement> {
 	index: Index
