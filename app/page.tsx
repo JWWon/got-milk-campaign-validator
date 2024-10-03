@@ -1,8 +1,8 @@
-import Sidebar from "./_layout/Sidebar";
-import IndexSelect from "./_components/IndexSelect";
+import Sidebar from "./layout/Sidebar";
+import IndexSelect from "./components/IndexSelect";
 import { Suspense } from "react";
 import { Skeleton } from "@nextui-org/skeleton";
-import VideoSelect, { VideoItemSkeleton } from "./components/VideoSelect";
+import VideoSelect, { VideoItemSkeleton } from "./_components/VideoSelect";
 
 export default function Home() {
   return (
