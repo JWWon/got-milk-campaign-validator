@@ -19,7 +19,7 @@ export default function Home() {
           <VideoSelect />
         </Suspense>
       </Sidebar>
-      <main className='flex-1 h-full overflow-y-auto'></main>
+      <main className='flex-1'></main>
     </div>
   );
 }

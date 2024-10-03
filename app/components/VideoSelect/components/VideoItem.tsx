@@ -22,13 +22,19 @@ export default function VideoItem({
   return (
     <button className={twMerge("py-2", className)} {...buttonProps}>
       <Image
-        className='w-full rounded-none mb-2'
+        className='w-full aspect-video object-contain bg-gray-950 rounded-none mb-2'
         alt={video.metadata.filename}
         src={video.hls?.thumbnailUrls?.[0]}
       />
       <div className='flex items-center justify-between'>
         <p className='truncate font-medium'>{video.metadata.filename}</p>
-        <Chip color='success'>Verified</Chip>
+        {video.metadata.status === "matched" && (
+          <Chip color='success'>Matched</Chip>
+        )}
+        {video.metadata.status === "not_matched" && (
+          <Chip color='success'>Not Matched</Chip>
+        )}
+        {!video.metadata.status && <Chip color='warning'>Processing</Chip>}
       </div>
     </button>
   );
