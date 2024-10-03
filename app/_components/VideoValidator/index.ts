@@ -1,1 +1,1 @@
-export { default } from "./VideoValidator";
+export { default } from './VideoValidator'

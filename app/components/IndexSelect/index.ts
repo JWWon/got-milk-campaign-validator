@@ -1,1 +1,1 @@
-export { default } from "./IndexSelect";
+export { default } from './IndexSelect'

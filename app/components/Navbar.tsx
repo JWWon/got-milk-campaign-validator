@@ -1,13 +1,13 @@
-import { NavbarBrand, Navbar as NextNavbar } from "@nextui-org/navbar";
-import TwelveLabsIcon from "@/icons/twelvelabs.svg";
+import { NavbarBrand, Navbar as NextNavbar } from '@nextui-org/navbar'
+import TwelveLabsIcon from '@/icons/twelvelabs.svg'
 
 export default function Navbar() {
-  return (
-    <NextNavbar>
-      <NavbarBrand className='gap-x-3'>
-        <TwelveLabsIcon className='w-6 h-6 dark:text-white text-[#333333]' />
-        <p className='font-bold text-lg'>Got Milk?</p>
-      </NavbarBrand>
-    </NextNavbar>
-  );
+	return (
+		<NextNavbar>
+			<NavbarBrand className="gap-x-3">
+				<TwelveLabsIcon className="h-6 w-6 text-[#333333] dark:text-white" />
+				<p className="text-lg font-bold">Got Milk?</p>
+			</NavbarBrand>
+		</NextNavbar>
+	)
 }

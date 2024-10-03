@@ -1,19 +1,19 @@
-"use client";
+'use client'
 
-import { NextUIProvider } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
-import QueryProvider from "@/app/_providers/QueryProvider";
+import { NextUIProvider } from '@nextui-org/react'
+import { useRouter } from 'next/navigation'
+import QueryProvider from '@/app/_providers/QueryProvider'
 
 export default function Providers({
-  children,
+	children
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode
 }>) {
-  const router = useRouter();
+	const router = useRouter()
 
-  return (
-    <QueryProvider>
-      <NextUIProvider navigate={router.push}>{children}</NextUIProvider>
-    </QueryProvider>
-  );
+	return (
+		<QueryProvider>
+			<NextUIProvider navigate={router.push}>{children}</NextUIProvider>
+		</QueryProvider>
+	)
 }
