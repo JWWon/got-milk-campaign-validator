@@ -3,26 +3,26 @@
 import { useSelectedVideoStore } from '@/app/utils/selectedVideoStore'
 import useVideos from './_hooks/useVideos'
 import { useShallow } from 'zustand/react/shallow'
-import type { Index } from 'twelvelabs-js'
 import { useInfiniteScroll } from '@nextui-org/use-infinite-scroll'
 import VideoItem from './_components/VideoItem'
 import VideoItemSkeleton from './_components/VideoItemSkeleton'
 import { RefObject, Suspense } from 'react'
 import { twMerge } from 'tailwind-merge'
+import type { IndexID } from '@/networks'
 
 interface Props {
-	selectedIndex: Index
+	selectedIndexID: IndexID
 }
 
-function VideoSelectWithIndex({ selectedIndex }: Props) {
-	const { video, setVideo } = useSelectedVideoStore(
+function VideoSelectWithIndex({ selectedIndexID }: Props) {
+	const { videoID, setVideo } = useSelectedVideoStore(
 		useShallow((state) => ({
-			video: state.video,
+			videoID: state.videoID,
 			setVideo: state.setVideo
 		}))
 	)
 
-	const { data: videos, hasNextPage, fetchNextPage } = useVideos(selectedIndex)
+	const { data: videos, hasNextPage, fetchNextPage } = useVideos(selectedIndexID)
 
 	const [loaderRef] = useInfiniteScroll({
 		hasMore: hasNextPage,
@@ -34,13 +34,13 @@ function VideoSelectWithIndex({ selectedIndex }: Props) {
 	return (
 		<div className="flex max-h-[60vh] flex-col gap-y-2 overflow-y-auto">
 			{videos.map((v) => {
-				const selected = video?.id === v.id
+				const selected = videoID === v._id
 				return (
-					<Suspense key={v.id} fallback={<VideoItemSkeleton />}>
+					<Suspense key={v._id} fallback={<VideoItemSkeleton />}>
 						<VideoItem
-							index={selectedIndex}
-							videoID={v.id}
-							onClick={() => setVideo(v)}
+							indexID={selectedIndexID}
+							videoID={v._id}
+							onClick={() => setVideo(v._id)}
 							className={twMerge('w-72 px-6', selected ? 'bg-gray-300' : 'opacity-80 hover:opacity-100')}
 						/>
 					</Suspense>
@@ -52,9 +52,9 @@ function VideoSelectWithIndex({ selectedIndex }: Props) {
 }
 
 export default function VideoSelect() {
-	const { index } = useSelectedVideoStore(useShallow((state) => ({ index: state.index })))
+	const { indexID } = useSelectedVideoStore(useShallow((state) => ({ indexID: state.indexID })))
 
-	if (index == null) return null
+	if (indexID == null) return null
 
-	return <VideoSelectWithIndex selectedIndex={index} />
+	return <VideoSelectWithIndex selectedIndexID={indexID} />
 }

@@ -2,12 +2,12 @@
 
 import { Chip } from '@nextui-org/chip'
 import React from 'react'
-import type { Video } from 'twelvelabs-js'
 import Section from './Section'
 import { Textarea } from '@nextui-org/input'
 import { Button } from '@nextui-org/button'
 import useVideoValidateForm, { VideoValidateSchema } from '../_hooks/useVideoValidateForm'
 import { Switch } from '@nextui-org/switch'
+import type { Video } from '@/networks'
 
 export interface VideoValidatorData {
 	prompt?: string

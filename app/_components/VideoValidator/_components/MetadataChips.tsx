@@ -1,15 +1,16 @@
+import { Video } from '@/networks'
 import { Chip, ChipProps } from '@nextui-org/chip'
 import { Skeleton } from '@nextui-org/skeleton'
 
 interface Props extends ChipProps {
-	stringifiedData: string | undefined
+	data: Video['metadata'][number]
 	isLoading?: boolean
 }
 
-export default function MetadataChips({ stringifiedData, isLoading, ...chipProps }: Props) {
-	const data = stringifiedData ? JSON.parse(stringifiedData) : undefined
+export default function MetadataChips({ data: rawData, isLoading, ...chipProps }: Props) {
+	const data = typeof rawData === 'string' ? JSON.parse(rawData) : undefined
 
-	if (!data || isLoading) {
+	if (!rawData || isLoading) {
 		return <Skeleton className="h-7 w-40 rounded-full" />
 	}
 

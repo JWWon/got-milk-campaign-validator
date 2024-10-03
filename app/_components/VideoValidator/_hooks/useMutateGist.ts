@@ -1,21 +1,26 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
-import { toast } from 'react-toastify'
-import type { Index, Video } from 'twelvelabs-js'
-import type { APIError } from 'twelvelabs-js/dist/error'
+'use client'
 
-export default function useInjectGistToMetadata(index: Index, video: Video) {
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'react-toastify'
+import useVideo from '@/app/hooks/useVideo'
+import type { AxiosError } from 'axios'
+import { type IndexID, type VideoID } from '@/networks'
+import { generateGist } from '../_actions/generateGist'
+
+export default function useInjectGistToMetadata(indexID: IndexID, videoID: VideoID) {
 	const [isLoading, setIsLoading] = useState(false)
 	const queryClient = useQueryClient()
 
-	const mutateGist = useMutation<void, APIError>({
+	const { data: video } = useVideo(indexID, videoID)
+
+	const mutateGist = useMutation<void, AxiosError>({
 		mutationFn: async () => {
 			setIsLoading(true)
-			const gist = await video.generateGist(['topic', 'hashtag'])
-			await video.update({ metadata: { hashtags: JSON.stringify(gist.hashtags), topics: JSON.stringify(gist.topics) } })
+			await generateGist(indexID, videoID)
 		},
 		onSuccess() {
-			queryClient.invalidateQueries({ queryKey: ['video', index.id, video.id] })
+			queryClient.invalidateQueries({ queryKey: ['video', indexID, videoID] })
 		},
 		onError(error) {
 			if (error.status === 429) {
@@ -27,8 +32,10 @@ export default function useInjectGistToMetadata(index: Index, video: Video) {
 		}
 	})
 
+	const isRequestedRef = useRef(false)
 	useEffect(() => {
-		if (!!video.metadata.hashtags && !!video.metadata.topics) return
+		if (isRequestedRef.current || (!!video.metadata.hashtags && !!video.metadata.topics)) return
+		isRequestedRef.current = true
 		mutateGist.mutate()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [video.metadata.hashtags, video.metadata.topics])

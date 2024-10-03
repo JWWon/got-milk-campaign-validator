@@ -1,25 +1,25 @@
-import type { Index, Video } from 'twelvelabs-js'
+import type { IndexID, VideoID } from '@/networks'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
 interface SelectedVideoState {
-	index: Index | undefined
-	video: Video | undefined
-	setIndex: (index: Index | undefined) => void
-	setVideo: (video: Video | undefined) => void
+	indexID: IndexID | undefined
+	videoID: VideoID | undefined
+	setIndex: (index: IndexID | undefined) => void
+	setVideo: (video: VideoID | undefined) => void
 }
 
 export const useSelectedVideoStore = create<SelectedVideoState>()((set) => ({
-	index: undefined,
-	video: undefined,
-	setIndex: (index) => set({ index }),
-	setVideo: (video) => set({ video })
+	indexID: undefined,
+	videoID: undefined,
+	setIndex: (indexID) => set({ indexID }),
+	setVideo: (videoID) => set({ videoID })
 }))
 
 export const useSelectedData = () =>
 	useSelectedVideoStore(
 		useShallow((state) => ({
-			index: state.index,
-			video: state.video
+			indexID: state.indexID,
+			videoID: state.videoID
 		}))
 	)

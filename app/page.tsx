@@ -1,4 +1,4 @@
-import Sidebar from './layout/Sidebar'
+import Sidebar from './layouts/Sidebar'
 import IndexSelect from './components/IndexSelect'
 import { Suspense } from 'react'
 import { Skeleton } from '@nextui-org/skeleton'

@@ -3,7 +3,6 @@
 import { useSelectedData } from '@/app/utils/selectedVideoStore'
 import { Suspense, useState } from 'react'
 import ReactPlayer from 'react-player'
-import type { Index, Video } from 'twelvelabs-js'
 import { formatDistance } from 'date-fns'
 import VideoValidatorSkeleton from './_components/VideoValidatorSkeleton'
 import HorizontalList from '@/app/components/HorizontalList'
@@ -13,15 +12,16 @@ import MetadataChips from './_components/MetadataChips'
 import useVideo from '@/app/hooks/useVideo'
 import VideoValidatorControl, { VideoValidatorData } from './_components/VideoValidatorControl'
 import Section from './_components/Section'
+import type { IndexID, VideoID } from '@/networks'
 
 interface Props {
-	index: Index
-	video: Video
+	indexID: IndexID
+	videoID: VideoID
 }
 
-function VideoValidator({ index, video: { id: videoID } }: Props) {
-	const { data: video } = useVideo(index, videoID)
-	const { isLoading: isLoadingGist } = useInjectGistToMetadata(index, video)
+function VideoValidator({ indexID, videoID }: Props) {
+	const { data: video } = useVideo(indexID, videoID)
+	const { isLoading: isLoadingGist } = useInjectGistToMetadata(indexID, videoID)
 
 	const [validatorData, setValidatorData] = useState<VideoValidatorData>()
 
@@ -30,18 +30,20 @@ function VideoValidator({ index, video: { id: videoID } }: Props) {
 	return (
 		<div className="flex gap-x-6">
 			<div className="flex flex-1 flex-col gap-y-4">
-				<ReactPlayer controls width="100%" height="100%" url={video.hls?.videoUrl} />
+				<ReactPlayer controls width="100%" height="100%" url={video.hls?.video_url} />
 				<p className="text-xl font-bold">{video.metadata.filename}</p>
 				<HorizontalList>
 					<p>{formatTimestamp(video.metadata.duration)}</p>
 					<p>{video.metadata.height}p</p>
-					<p>{formatDistance(video.indexedAt ?? new Date(), video.createdAt, { includeSeconds: true })} for indexing</p>
+					<p>
+						{formatDistance(video.indexed_at ?? new Date(), video.created_at, { includeSeconds: true })} for indexing
+					</p>
 				</HorizontalList>
 				<Section title="Topic">
-					<MetadataChips color="primary" isLoading={isLoadingGist} stringifiedData={video.metadata.topics} />
+					<MetadataChips color="primary" isLoading={isLoadingGist} data={video.metadata.topics} />
 				</Section>
 				<Section title="Auto-gen Hashtags">
-					<MetadataChips isLoading={isLoadingGist} stringifiedData={video.metadata.hashtags} />
+					<MetadataChips isLoading={isLoadingGist} data={video.metadata.hashtags} />
 				</Section>
 			</div>
 			<div className="basis-60">
@@ -52,9 +54,9 @@ function VideoValidator({ index, video: { id: videoID } }: Props) {
 }
 
 export default function ValidatorWithFallback() {
-	const { index, video } = useSelectedData()
+	const { indexID, videoID } = useSelectedData()
 
-	if (!index || !video) {
+	if (!indexID || !videoID) {
 		return (
 			<div className="flex h-full w-full items-center justify-center">
 				<p>Please select video to validate 🥺</p>
@@ -65,7 +67,7 @@ export default function ValidatorWithFallback() {
 	return (
 		<div className="h-full w-full rounded-medium border border-gray-100 p-6 shadow-lg shadow-gray-400/30 dark:bg-gray-700/20 dark:shadow-white/20">
 			<Suspense fallback={<VideoValidatorSkeleton />}>
-				<VideoValidator index={index} video={video} />
+				<VideoValidator indexID={indexID} videoID={videoID} />
 			</Suspense>
 		</div>
 	)

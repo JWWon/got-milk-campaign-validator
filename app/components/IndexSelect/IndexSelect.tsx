@@ -12,16 +12,16 @@ type Props = Omit<SelectProps, 'children' | 'items' | 'isLoading' | 'selectionMo
 export default function IndexSelect({ ...params }: Props) {
 	const { data: indexes, isFetching, hasNextPage, fetchNextPage } = useIndexes()
 
-	const { index, setIndex } = useSelectedVideoStore(
+	const { indexID, setIndexID } = useSelectedVideoStore(
 		useShallow((state) => ({
-			index: state.index,
-			setIndex: state.setIndex
+			indexID: state.indexID,
+			setIndexID: state.setIndex
 		}))
 	)
-	const indexIDs = useMemo(() => new Set(index?.id ? [index.id] : []), [index?.id])
+	const indexIDs = useMemo(() => new Set(indexID ? [indexID] : []), [indexID])
 
 	useEffect(() => {
-		setIndex(indexes[0])
+		setIndexID(indexes[0]._id)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
@@ -44,14 +44,14 @@ export default function IndexSelect({ ...params }: Props) {
 			items={indexes}
 			onOpenChange={setIsOpen}
 			selectedKeys={indexIDs}
-			isInvalid={!index}
-			errorMessage={!index ? 'Please select an index' : null}
-			onChange={(e) => setIndex(indexes.find((i) => i.id === e.target.value))}
+			isInvalid={!indexID}
+			errorMessage={!indexID ? 'Please select an index' : null}
+			onChange={(e) => setIndexID(indexes.find((i) => i._id === e.target.value)?._id)}
 			{...params}
 		>
 			{(index) => (
-				<SelectItem key={index.id} className="[&>span]:truncate">
-					{index.name}
+				<SelectItem key={index._id} className="[&>span]:truncate">
+					{index.index_name}
 				</SelectItem>
 			)}
 		</Select>

@@ -1,20 +1,17 @@
-import { getTwelveLabs } from '@/utils/twelvelabs'
+import { retrieveVideoList } from '@/networks'
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query'
-import type { Index, ListVideoParams } from 'twelvelabs-js'
 
-export default function useVideos(index: Index, params: Omit<ListVideoParams, 'page'> = {}) {
+export default function useVideos(...[indexID, params, config]: Parameters<typeof retrieveVideoList>) {
 	return useSuspenseInfiniteQuery({
-		queryKey: ['videos', index.id, params],
+		queryKey: ['videos', indexID, params],
 		queryFn: ({ pageParam }) =>
-			getTwelveLabs()
-				.index.video.listPagination(index.id, { ...params, page: pageParam })
-				.then(({ data, pageInfo }) => ({ data, pageInfo })),
+			retrieveVideoList(indexID, { ...params, page: pageParam }, config).then(({ data }) => data),
 		select(data) {
 			return data.pages.flatMap((page) => page.data)
 		},
 		initialPageParam: 1,
-		getNextPageParam({ pageInfo }) {
-			return pageInfo.page < pageInfo.totalPage ? pageInfo.page + 1 : undefined
+		getNextPageParam({ page_info }) {
+			return page_info.page < page_info.total_page ? page_info.page + 1 : undefined
 		}
 	})
 }

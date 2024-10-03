@@ -1,20 +1,16 @@
-import { getTwelveLabs } from '@/utils/twelvelabs'
+import { retrieveIndexList } from '@/networks'
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query'
-import { ListIndexParams } from 'twelvelabs-js'
 
-export default function useIndexes(params: Omit<ListIndexParams, 'page'> = {}) {
+export default function useIndexes(...[params, config]: Parameters<typeof retrieveIndexList>) {
 	return useSuspenseInfiniteQuery({
 		queryKey: ['indexes', params],
-		queryFn: ({ pageParam }) =>
-			getTwelveLabs()
-				.index.listPagination({ ...params, page: pageParam })
-				.then(({ data, pageInfo }) => ({ data, pageInfo })),
+		queryFn: ({ pageParam }) => retrieveIndexList({ ...params, page: pageParam }, config).then(({ data }) => data),
 		select(data) {
 			return data.pages.flatMap((page) => page.data)
 		},
 		initialPageParam: 1,
-		getNextPageParam({ pageInfo }) {
-			return pageInfo.page < pageInfo.totalPage ? pageInfo.page + 1 : undefined
+		getNextPageParam({ page_info }) {
+			return page_info.page < page_info.total_page ? page_info.page + 1 : undefined
 		}
 	})
 }
