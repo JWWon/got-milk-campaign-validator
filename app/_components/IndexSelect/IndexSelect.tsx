@@ -3,12 +3,11 @@
 import { Select, SelectItem, SelectProps } from "@nextui-org/select";
 import useIndexes from "./hooks/useIndexes";
 import { useInfiniteScroll } from "@nextui-org/use-infinite-scroll";
+import { useSelectedVideoStore } from "@/app/utils/selectedVideoStore";
+import { useShallow } from "zustand/react/shallow";
 import { useEffect, useMemo, useState } from "react";
-import { useIndexID } from "@/app/utils/selectedVideoStore";
 
-export default function IndexSelect({
-  ...props
-}: Omit<
+type Props = Omit<
   SelectProps,
   | "children"
   | "items"
@@ -16,7 +15,9 @@ export default function IndexSelect({
   | "selectionMode"
   | "scrollRef"
   | "onOpenChange"
->) {
+>;
+
+export default function IndexSelect({ ...params }: Props) {
   const {
     data: indexes,
     isFetching,
@@ -24,11 +25,19 @@ export default function IndexSelect({
     fetchNextPage,
   } = useIndexes();
 
-  const { indexID, setIndexID } = useIndexID();
-  const indexIDs = useMemo(() => new Set(indexID ? [indexID] : []), [indexID]);
+  const { index, setIndex } = useSelectedVideoStore(
+    useShallow((state) => ({
+      index: state.index,
+      setIndex: state.setIndex,
+    }))
+  );
+  const indexIDs = useMemo(
+    () => new Set(index?.id ? [index.id] : []),
+    [index?.id]
+  );
 
   useEffect(() => {
-    setIndexID(indexes[0].id);
+    setIndex(indexes[0]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -51,10 +60,10 @@ export default function IndexSelect({
       items={indexes}
       onOpenChange={setIsOpen}
       selectedKeys={indexIDs}
-      isInvalid={!indexID}
-      errorMessage={!indexID ? "Please select an index" : null}
-      onChange={(e) => setIndexID(e.target.value)}
-      {...props}
+      isInvalid={!index}
+      errorMessage={!index ? "Please select an index" : null}
+      onChange={(e) => setIndex(indexes.find((i) => i.id === e.target.value))}
+      {...params}
     >
       {(index) => (
         <SelectItem key={index.id} className='[&>span]:truncate'>

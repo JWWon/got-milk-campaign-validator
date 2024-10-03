@@ -1,13 +1,16 @@
 import { getTwelveLabs } from "@/utils/twelvelabs";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { ListIndexParams } from "twelvelabs-js";
+import type { Index, ListVideoParams } from "twelvelabs-js";
 
-export default function useIndexes(params: Omit<ListIndexParams, "page"> = {}) {
+export default function useVideos(
+  index: Index,
+  params: Omit<ListVideoParams, "page"> = {}
+) {
   return useSuspenseInfiniteQuery({
-    queryKey: ["indexes", params],
+    queryKey: ["videos", index.id, params],
     queryFn: ({ pageParam }) =>
       getTwelveLabs()
-        .index.listPagination({ ...params, page: pageParam })
+        .index.video.listPagination(index.id, { ...params, page: pageParam })
         .then(({ data, pageInfo }) => ({ data, pageInfo })),
     select(data) {
       return data.pages.flatMap((page) => page.data);
