@@ -1,10 +1,10 @@
 'use client'
 
 import { Image } from '@nextui-org/image'
-import { Chip } from '@nextui-org/chip'
 import { twMerge } from 'tailwind-merge'
 import useVideo from '@/app/hooks/useVideo'
 import type { IndexID, VideoID } from '@/networks'
+import ValidateStatusChip from '@/app/components/ValidateStatusChip'
 
 interface Props extends React.HTMLAttributes<HTMLButtonElement> {
 	indexID: IndexID
@@ -23,9 +23,7 @@ export default function VideoItem({ indexID, videoID, className, ...buttonProps 
 			/>
 			<div className="flex items-center justify-between">
 				<p className="truncate font-medium">{video.metadata.filename}</p>
-				{video.metadata.status === 'matched' && <Chip color="success">Matched</Chip>}
-				{video.metadata.status === 'not_matched' && <Chip color="success">Not Matched</Chip>}
-				{!video.metadata.status && <Chip color="warning">Processing</Chip>}
+				<ValidateStatusChip metadata={video.metadata} />
 			</div>
 		</button>
 	)

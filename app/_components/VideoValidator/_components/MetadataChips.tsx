@@ -15,7 +15,7 @@ export default function MetadataChips({ data: rawData, isLoading, ...chipProps }
 	}
 
 	return (
-		<div className="flex items-center gap-x-2">
+		<div className="flex flex-wrap items-center gap-2">
 			{Array.isArray(data) ? (
 				data.map((item) => (
 					<Chip key={item} {...chipProps}>

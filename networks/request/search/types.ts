@@ -17,7 +17,7 @@ export enum ConversationOption {
 	EXACT_MATCH = 'exact_match'
 }
 
-export interface SearchParams {
+interface SearchParamsBase {
 	index_id: IndexID
 	filter?: {
 		/**
@@ -62,26 +62,6 @@ export interface SearchParams {
 	 */
 	adjust_confidence_level?: number
 	/**
-	 * extra options for debugging
-	 */
-	extra_options?: string
-	/**
-	 * Text query for search
-	 */
-	query_text?: string
-	/**
-	 * Publicly accessible URL for image search
-	 */
-	query_media_url?: string
-	/**
-	 * Type of media search, 'image' is the only option at the moment
-	 */
-	query_media_type?: 'image'
-	/**
-	 * Object url for image blob which will be sent to the server for image query
-	 */
-	query_media_file?: string
-	/**
 	 * Array that specifies the sources of information the platform uses when performing a search
 	 */
 	search_options: EngineOption[]
@@ -94,6 +74,43 @@ export interface SearchParams {
 	 */
 	conversation_option?: ConversationOption
 }
+
+export type SearchParams = SearchParamsBase &
+	(
+		| {
+				/**
+				 * Text query for search
+				 */
+				query_text: string
+				query_media_type?: never
+				query_media_url?: never
+				query_media_file?: never
+		  }
+		| {
+				query_text?: never
+				/**
+				 * Type of media search, 'image' is the only option at the moment
+				 */
+				query_media_type: 'image'
+				/**
+				 * Publicly accessible URL for image search
+				 */
+				query_media_url: string
+				query_media_file?: never
+		  }
+		| {
+				query_text?: never
+				/**
+				 * Type of media search, 'image' is the only option at the moment
+				 */
+				query_media_type: 'image'
+				query_media_url?: never
+				/**
+				 * Object url for image blob which will be sent to the server for image query
+				 */
+				query_media_file: string
+		  }
+	)
 
 export interface SearchResponse {
 	score: number

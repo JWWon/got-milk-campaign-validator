@@ -1,13 +1,15 @@
 'use client'
 
-import { Chip } from '@nextui-org/chip'
 import React from 'react'
 import Section from './Section'
 import { Textarea } from '@nextui-org/input'
 import { Button } from '@nextui-org/button'
 import useVideoValidateForm, { VideoValidateSchema } from '../_hooks/useVideoValidateForm'
 import { Switch } from '@nextui-org/switch'
-import type { Video } from '@/networks'
+import type { IndexID, Video } from '@/networks'
+import ValidateStatusChip from '@/app/components/ValidateStatusChip'
+import useValidateVideo from '../_hooks/useValidateVideo'
+import { toast } from 'react-toastify'
 
 export interface VideoValidatorData {
 	prompt?: string
@@ -15,11 +17,11 @@ export interface VideoValidatorData {
 }
 
 interface Props {
+	indexID: IndexID
 	video: Video
-	onSubmit: (data: VideoValidatorData) => void
 }
 
-export default function VideoValidatorControl({ video, onSubmit }: Props) {
+export default function VideoValidatorControl({ indexID, video }: Props) {
 	const {
 		register,
 		watch,
@@ -27,18 +29,23 @@ export default function VideoValidatorControl({ video, onSubmit }: Props) {
 		formState: { errors, isValid }
 	} = useVideoValidateForm()
 
-	const onRawSubmit = ({ prompt, queries }: VideoValidateSchema) =>
-		onSubmit({ prompt, queries: queries?.replace(', ', ',').split(',') })
+	const validateVideo = useValidateVideo(indexID, video._id)
+
+	const onSubmit = ({ prompt, queries }: VideoValidateSchema) => {
+		if (!prompt && !queries) {
+			toast('Please select at least one of validate options', { type: 'warning' })
+			return
+		}
+		return validateVideo.mutateAsync({ prompt: prompt!, queries: queries!.replace(', ', ',').split(',') })
+	}
 
 	return (
 		<div className="flex w-full flex-col gap-y-4">
 			<Section title="Validation Status">
-				{video.metadata.status === 'matched' && <Chip color="success">Matched</Chip>}
-				{video.metadata.status === 'not_matched' && <Chip color="success">Not Matched</Chip>}
-				{!video.metadata.status && <Chip color="warning">Processing</Chip>}
+				<ValidateStatusChip metadata={video.metadata} />
 			</Section>
 			<Section title="Criteria">
-				<form onSubmit={handleSubmit(onRawSubmit)}>
+				<form onSubmit={handleSubmit(onSubmit)}>
 					<div className="flex w-full flex-col gap-y-3">
 						<Switch {...register('use_prompt')}>Use prompt</Switch>
 						{watch('use_prompt') && (
@@ -46,7 +53,7 @@ export default function VideoValidatorControl({ video, onSubmit }: Props) {
 								{...register('prompt')}
 								isRequired
 								label="Prompt message"
-								description="Prompt should request to return boolean value only"
+								description="Prompt should request to return boolean string only"
 								errorMessage={errors.prompt?.message}
 							/>
 						)}
@@ -60,7 +67,7 @@ export default function VideoValidatorControl({ video, onSubmit }: Props) {
 								errorMessage={errors.queries?.message}
 							/>
 						)}
-						<Button type="submit" color="primary" isDisabled={!isValid}>
+						<Button type="submit" color="primary" isDisabled={!isValid} isLoading={validateVideo.isPending}>
 							{!video.metadata.status ? 'Validate' : 'Revalidate'}
 						</Button>
 					</div>

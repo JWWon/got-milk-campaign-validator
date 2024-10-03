@@ -7,10 +7,10 @@ import { formatDistance } from 'date-fns'
 import VideoValidatorSkeleton from './_components/VideoValidatorSkeleton'
 import HorizontalList from '@/app/components/HorizontalList'
 import formatTimestamp from '@/app/utils/formatTimestamp'
-import useInjectGistToMetadata from './_hooks/useMutateGist'
+import useGenerateGist from './_hooks/useGenerateGist'
 import MetadataChips from './_components/MetadataChips'
 import useVideo from '@/app/hooks/useVideo'
-import VideoValidatorControl, { VideoValidatorData } from './_components/VideoValidatorControl'
+import VideoValidatorControl from './_components/VideoValidatorControl'
 import Section from './_components/Section'
 import type { IndexID, VideoID } from '@/networks'
 
@@ -21,11 +21,7 @@ interface Props {
 
 function VideoValidator({ indexID, videoID }: Props) {
 	const { data: video } = useVideo(indexID, videoID)
-	const { isLoading: isLoadingGist } = useInjectGistToMetadata(indexID, videoID)
-
-	const [validatorData, setValidatorData] = useState<VideoValidatorData>()
-
-	console.log({ validatorData })
+	const { isPending: isPendingGist } = useGenerateGist(indexID, videoID)
 
 	return (
 		<div className="flex gap-x-6">
@@ -40,14 +36,14 @@ function VideoValidator({ indexID, videoID }: Props) {
 					</p>
 				</HorizontalList>
 				<Section title="Topic">
-					<MetadataChips color="primary" isLoading={isLoadingGist} data={video.metadata.topics} />
+					<MetadataChips color="primary" isLoading={isPendingGist} data={video.metadata.topics} />
 				</Section>
 				<Section title="Auto-gen Hashtags">
-					<MetadataChips isLoading={isLoadingGist} data={video.metadata.hashtags} />
+					<MetadataChips isLoading={isPendingGist} data={video.metadata.hashtags} />
 				</Section>
 			</div>
 			<div className="basis-60">
-				<VideoValidatorControl video={video} onSubmit={setValidatorData} />
+				<VideoValidatorControl video={video} indexID={indexID} />
 			</div>
 		</div>
 	)

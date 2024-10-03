@@ -2,7 +2,10 @@ import type { AxiosRequestConfig } from 'axios'
 import { getTwelveLabsAPI } from '../_common'
 import type { GroupBy, PageToken, SearchParams, SearchResponseGroupByClip, SearchResponseGroupByVideo } from './types'
 
-export async function search<T extends GroupBy>(data: SearchParams | PageToken, config?: AxiosRequestConfig) {
+export async function search<T extends GroupBy = GroupBy.clip>(
+	data: SearchParams | PageToken,
+	config?: AxiosRequestConfig
+) {
 	const formData = new FormData()
 
 	if (typeof data === 'object') {
