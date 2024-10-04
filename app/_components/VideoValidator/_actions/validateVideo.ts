@@ -1,45 +1,86 @@
 'use server'
 
-import { EngineOption, generate, search, updateVideo, type IndexID, type VideoID } from '@/networks'
-import { VALIDATE_STATUS_KEY, ValidateStatus } from '@/app/constants/metadata'
+import { EngineOption, generate, search, type IndexID, type VideoID } from '@/networks'
 import { Confidence } from '@/networks/request/search/types'
 
-export type VideoValidateParams =
-	| { prompt: string; queries?: never }
-	| { prompt?: never; queries: string[] }
-	| { prompt: string; queries: string[] }
+export interface VideoValidateParams {
+	prompt?: string
+	queries?: string[]
+}
 
-export default async function validateVideo(indexID: IndexID, videoID: VideoID, data: VideoValidateParams) {
+export interface ValidateVideoResponse {
+	matched: boolean
+	description?: string
+}
+
+const promptWithFormatGuide = (prompt: string) => `${prompt}
+
+Print the response with following JSON format below.
+
+{
+  "matched": true|false,
+  "description": "Video is matched|not matched because,"
+}
+`
+
+class ValidateWithSearchError extends Error {
+	readonly query: string
+
+	readonly videoID: VideoID
+
+	constructor({ query, videoID }: { query: string; videoID: VideoID }) {
+		super('Video is not matched to query')
+		this.query = query
+		this.videoID = videoID
+	}
+}
+
+export default async function validateVideo(
+	indexID: IndexID,
+	videoID: VideoID,
+	data: VideoValidateParams
+): Promise<ValidateVideoResponse> {
+	let description = ''
+
 	if (!!data.prompt) {
 		const {
 			data: { data: text }
-		} = await generate({ video_id: videoID, prompt: data.prompt })
-		if (JSON.parse(text) !== true) {
-			await updateVideo(indexID, videoID, { metadata: { [VALIDATE_STATUS_KEY]: ValidateStatus.NOT_MATCHED } })
-			return false
+		} = await generate({ video_id: videoID, prompt: promptWithFormatGuide(data.prompt) })
+		console.log({ generate: text })
+		const response: ValidateVideoResponse = JSON.parse(text)
+
+		if ('matched' in response && !response.matched) {
+			return response
+		}
+
+		if (typeof response.description === 'string') {
+			description = response.description
 		}
 	}
 
-	if (!!data.queries) {
-		const responses = await Promise.all(
-			data.queries.map((query) =>
-				search({
-					index_id: indexID,
-					query_text: query,
-					threshold: Confidence.HIGH,
-					search_options: Object.values(EngineOption),
-					filter: { id: [videoID] }
+	if (data.queries?.length) {
+		try {
+			await Promise.all(
+				data.queries.map(async (query) => {
+					const { data } = await search({
+						index_id: indexID,
+						query_text: query,
+						threshold: Confidence.HIGH,
+						search_options: Object.values(EngineOption),
+						filter: { id: [videoID] }
+					})
+					if (data.page_info.total_results < 1) {
+						throw new ValidateWithSearchError({ query, videoID })
+					}
 				})
 			)
-		)
-		for (const results of responses.map((res) => res.data.page_info.total_results)) {
-			if (results < 1) {
-				await updateVideo(indexID, videoID, { metadata: { [VALIDATE_STATUS_KEY]: ValidateStatus.NOT_MATCHED } })
-				return false
+		} catch (err) {
+			if (err instanceof ValidateWithSearchError) {
+				return { matched: false, description: `Query "${err.query}" is not matched to the video ${err.videoID}.` }
 			}
+			throw err
 		}
 	}
 
-	await updateVideo(indexID, videoID, { metadata: { [VALIDATE_STATUS_KEY]: ValidateStatus.MATCHED } })
-	return true
+	return { matched: true, description: description || undefined }
 }

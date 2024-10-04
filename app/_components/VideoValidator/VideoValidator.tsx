@@ -1,7 +1,7 @@
 'use client'
 
 import { useSelectedData } from '@/app/utils/selectedVideoStore'
-import { Suspense, useState } from 'react'
+import { Suspense } from 'react'
 import ReactPlayer from 'react-player'
 import { formatDistance } from 'date-fns'
 import VideoValidatorSkeleton from './_components/VideoValidatorSkeleton'
@@ -42,7 +42,7 @@ function VideoValidator({ indexID, videoID }: Props) {
 					<MetadataChips isLoading={isPendingGist} data={video.metadata.hashtags} />
 				</Section>
 			</div>
-			<div className="basis-60">
+			<div className="basis-60 xl:basis-80">
 				<VideoValidatorControl video={video} indexID={indexID} />
 			</div>
 		</div>

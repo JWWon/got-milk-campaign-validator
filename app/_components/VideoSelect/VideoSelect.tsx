@@ -10,11 +10,11 @@ import { RefObject, Suspense } from 'react'
 import { twMerge } from 'tailwind-merge'
 import type { IndexID } from '@/networks'
 
-interface Props {
-	selectedIndexID: IndexID
+interface InternalProps {
+	indexID: IndexID
 }
 
-function VideoSelectWithIndex({ selectedIndexID }: Props) {
+function VideoSelect({ indexID }: InternalProps) {
 	const { videoID, setVideo } = useSelectedVideoStore(
 		useShallow((state) => ({
 			videoID: state.videoID,
@@ -22,7 +22,7 @@ function VideoSelectWithIndex({ selectedIndexID }: Props) {
 		}))
 	)
 
-	const { data: videos, hasNextPage, fetchNextPage } = useVideos(selectedIndexID)
+	const { data: videos, hasNextPage, fetchNextPage } = useVideos(indexID)
 
 	const [loaderRef] = useInfiniteScroll({
 		hasMore: hasNextPage,
@@ -38,7 +38,7 @@ function VideoSelectWithIndex({ selectedIndexID }: Props) {
 				return (
 					<Suspense key={v._id} fallback={<VideoItemSkeleton />}>
 						<VideoItem
-							indexID={selectedIndexID}
+							indexID={indexID}
 							videoID={v._id}
 							onClick={() => setVideo(v._id)}
 							className={twMerge('w-72 px-6', selected ? 'bg-gray-300' : 'opacity-80 hover:opacity-100')}
@@ -51,10 +51,14 @@ function VideoSelectWithIndex({ selectedIndexID }: Props) {
 	)
 }
 
-export default function VideoSelect() {
+export default function VideoSelectWithFallback() {
 	const { indexID } = useSelectedVideoStore(useShallow((state) => ({ indexID: state.indexID })))
 
 	if (indexID == null) return null
 
-	return <VideoSelectWithIndex selectedIndexID={indexID} />
+	return (
+		<Suspense fallback={<VideoItemSkeleton />}>
+			<VideoSelect indexID={indexID} />
+		</Suspense>
+	)
 }

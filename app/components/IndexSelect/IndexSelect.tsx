@@ -5,11 +5,16 @@ import useIndexes from './_hooks/useIndexes'
 import { useInfiniteScroll } from '@nextui-org/use-infinite-scroll'
 import { useSelectedVideoStore } from '@/app/utils/selectedVideoStore'
 import { useShallow } from 'zustand/react/shallow'
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
+import { useQueryErrorResetBoundary } from '@tanstack/react-query'
+import { Skeleton } from '@nextui-org/skeleton'
+import { ErrorBoundary } from 'react-error-boundary'
+import { Button } from '@nextui-org/button'
+import { twMerge } from 'tailwind-merge'
 
 type Props = Omit<SelectProps, 'children' | 'items' | 'isLoading' | 'selectionMode' | 'scrollRef' | 'onOpenChange'>
 
-export default function IndexSelect({ ...params }: Props) {
+function IndexSelect({ ...params }: Props) {
 	const { data: indexes, isFetching, hasNextPage, fetchNextPage } = useIndexes()
 
 	const { indexID, setIndexID } = useSelectedVideoStore(
@@ -55,5 +60,23 @@ export default function IndexSelect({ ...params }: Props) {
 				</SelectItem>
 			)}
 		</Select>
+	)
+}
+
+export default function IndexSelectWithFallback(props: Props) {
+	const { reset } = useQueryErrorResetBoundary()
+	return (
+		<Suspense fallback={<Skeleton className={twMerge('h-10 w-full rounded-medium', props.className)} />}>
+			<ErrorBoundary
+				onReset={reset}
+				fallbackRender={({ resetErrorBoundary }) => (
+					<Button fullWidth className={props.className} onClick={resetErrorBoundary}>
+						Click to retry
+					</Button>
+				)}
+			>
+				<IndexSelect {...props} />
+			</ErrorBoundary>
+		</Suspense>
 	)
 }

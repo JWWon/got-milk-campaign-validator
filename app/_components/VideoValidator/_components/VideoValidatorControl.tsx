@@ -36,7 +36,7 @@ export default function VideoValidatorControl({ indexID, video }: Props) {
 			toast('Please select at least one of validate options', { type: 'warning' })
 			return
 		}
-		return validateVideo.mutateAsync({ prompt: prompt!, queries: queries!.replace(', ', ',').split(',') })
+		return validateVideo.mutateAsync({ prompt, queries: queries?.replace(', ', ',').split(',') })
 	}
 
 	return (
@@ -53,7 +53,7 @@ export default function VideoValidatorControl({ indexID, video }: Props) {
 								{...register('prompt')}
 								isRequired
 								label="Prompt message"
-								description="Prompt should request to return boolean string only"
+								description="Prompt should request to decide whether the content matches the condition or not"
 								errorMessage={errors.prompt?.message}
 							/>
 						)}
