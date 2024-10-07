@@ -60,14 +60,15 @@ export default async function validateVideo(
 
 	if (data.queries?.length) {
 		try {
+			console.log({ queries: data.queries })
 			await Promise.all(
 				data.queries.map(async (query) => {
 					const { data } = await search({
 						index_id: indexID,
 						query_text: query,
 						threshold: Confidence.HIGH,
-						search_options: Object.values(EngineOption),
-						filter: { id: [videoID] }
+						search_options: Object.values(EngineOption)
+						// filter: { id: [videoID] } // TODO: Uncomment this line after fixing 'filter' field in search request
 					})
 					if (data.page_info.total_results < 1) {
 						throw new ValidateWithSearchError({ query, videoID })

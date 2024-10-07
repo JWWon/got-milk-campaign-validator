@@ -31,12 +31,15 @@ export default function VideoValidatorControl({ indexID, video }: Props) {
 
 	const validateVideo = useValidateVideo(indexID, video._id)
 
-	const onSubmit = ({ prompt, queries }: VideoValidateSchema) => {
+	const onSubmit = ({ prompt, queries, use_prompt, use_queries }: VideoValidateSchema) => {
 		if (!prompt && !queries) {
 			toast('Please select at least one of validate options', { type: 'warning' })
 			return
 		}
-		return validateVideo.mutateAsync({ prompt, queries: queries?.replace(', ', ',').split(',') })
+		return validateVideo.mutateAsync({
+			prompt: use_prompt ? prompt : undefined,
+			queries: use_queries ? queries?.replace(', ', ',').split(',') : undefined
+		})
 	}
 
 	return (
