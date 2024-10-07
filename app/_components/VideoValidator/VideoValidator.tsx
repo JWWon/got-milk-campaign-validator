@@ -13,6 +13,7 @@ import useVideo from '@/app/hooks/useVideo'
 import VideoValidatorControl from './_components/VideoValidatorControl'
 import Section from './_components/Section'
 import type { IndexID, VideoID } from '@/networks'
+import HashtagsControl from './_components/HashtagsControl'
 
 interface Props {
 	indexID: IndexID
@@ -26,7 +27,9 @@ function VideoValidator({ indexID, videoID }: Props) {
 	return (
 		<div className="flex gap-x-6">
 			<div className="flex flex-1 flex-col gap-y-4">
-				<ReactPlayer controls width="100%" height="100%" url={video.hls?.video_url} />
+				<div className="aspect-video w-full">
+					<ReactPlayer controls width="100%" height="100%" url={video.hls?.video_url} />
+				</div>
 				<p className="text-xl font-bold">{video.metadata.filename}</p>
 				<HorizontalList>
 					<p>{formatTimestamp(video.metadata.duration)}</p>
@@ -42,8 +45,9 @@ function VideoValidator({ indexID, videoID }: Props) {
 					<MetadataChips isLoading={isPendingGist} data={video.metadata.hashtags} />
 				</Section>
 			</div>
-			<div className="basis-60 xl:basis-80">
+			<div className="flex basis-60 flex-col gap-y-8 xl:basis-80">
 				<VideoValidatorControl video={video} indexID={indexID} />
+				<HashtagsControl indexID={indexID} videoID={videoID} />
 			</div>
 		</div>
 	)
