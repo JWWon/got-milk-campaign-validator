@@ -14,6 +14,7 @@ export default function useGenerateHashtags(indexID: IndexID, videoID: VideoID) 
 	const queryClient = useQueryClient()
 
 	return useMutation<string[], AxiosError, string>({
+		mutationKey: ['hashtags', indexID, videoID],
 		async mutationFn(prompt) {
 			const {
 				data: { data: text }

@@ -14,6 +14,7 @@ import VideoValidatorControl from './_components/VideoValidatorControl'
 import Section from './_components/Section'
 import type { IndexID, VideoID } from '@/networks'
 import HashtagsControl from './_components/HashtagsControl'
+import { useMutationState } from '@tanstack/react-query'
 
 interface Props {
 	indexID: IndexID
@@ -23,6 +24,10 @@ interface Props {
 function VideoValidator({ indexID, videoID }: Props) {
 	const { data: video } = useVideo(indexID, videoID)
 	const { isPending: isPendingGist } = useGenerateGist(indexID, videoID)
+	const hashtagStates = useMutationState({
+		filters: { mutationKey: ['hashtags', indexID, videoID] }
+	})
+	const isPendingHashtag = hashtagStates[hashtagStates.length - 1]?.status === 'pending'
 
 	return (
 		<div className="flex gap-x-6">
@@ -42,7 +47,7 @@ function VideoValidator({ indexID, videoID }: Props) {
 					<MetadataChips color="primary" isLoading={isPendingGist} data={video.metadata.topics} />
 				</Section>
 				<Section title="Auto-gen Hashtags">
-					<MetadataChips isLoading={isPendingGist} data={video.metadata.hashtags} />
+					<MetadataChips isLoading={isPendingGist || isPendingHashtag} data={video.metadata.hashtags} />
 				</Section>
 			</div>
 			<div className="flex basis-60 flex-col gap-y-8 xl:basis-80">

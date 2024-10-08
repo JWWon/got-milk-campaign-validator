@@ -30,6 +30,7 @@ export default function HashtagsControl({ indexID, videoID }: Props) {
 
 	const queryClient = useQueryClient()
 	const reset = useMutation<void, AxiosError>({
+		mutationKey: ['hashtags', indexID, videoID],
 		mutationFn() {
 			return generateGist(indexID, videoID, [GistType.HASHTAG])
 		},
