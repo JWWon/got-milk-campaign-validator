@@ -43,13 +43,14 @@ export default async function validateVideo(
 	let description = ''
 
 	if (!!data.prompt) {
-		const {
-			data: { data: text }
-		} = await generate({ video_id: videoID, prompt: promptWithFormatGuide(data.prompt) })
-		console.log({ generate: text })
+		const { data: rawText } = await generate({ video_id: videoID, prompt: promptWithFormatGuide(data.prompt) }).then(
+			({ data }) => data
+		)
+		const refinedText = rawText.replace(/(`+|json|\n)/g, '')
+		console.log({ generate: refinedText })
 
 		try {
-			const response: ValidateVideoResponse = JSON.parse(text)
+			const response: ValidateVideoResponse = JSON.parse(refinedText)
 			if ('matched' in response && !response.matched) {
 				return response
 			}
