@@ -51,13 +51,13 @@ export default async function validateVideo(
 
 		try {
 			const response: ValidateVideoResponse = JSON.parse(refinedText)
-			if ('matched' in response && !response.matched) {
-				return response
+			if (typeof response.matched !== 'boolean' || typeof response.description !== 'string') {
+				throw new SyntaxError(`Invalid generate response format: ${refinedText}`)
 			}
 
-			if (typeof response.description === 'string') {
-				description = response.description
-			}
+			if (!response.matched) return response
+
+			description = response.description
 		} catch (e) {
 			if (e instanceof Error) {
 				if (e instanceof SyntaxError) {
