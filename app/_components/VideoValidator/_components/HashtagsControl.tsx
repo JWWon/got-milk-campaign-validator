@@ -4,6 +4,11 @@ import Section from './Section'
 import useGenerateHashtagsForm, { GenerateHashtagsSchema } from '../_hooks/useGenerateHashtagsForm'
 import { Textarea } from '@nextui-org/input'
 import { Button } from '@nextui-org/button'
+import { GistType } from '@/networks/request/generate/types'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
+import generateGist from '../_actions/generateGist'
+import { toast } from 'react-toastify'
 
 interface Props {
 	indexID: IndexID
@@ -23,6 +28,21 @@ export default function HashtagsControl({ indexID, videoID }: Props) {
 		return generateHashtags.mutateAsync(hashtag_prompt)
 	}
 
+	const queryClient = useQueryClient()
+	const reset = useMutation<void, AxiosError>({
+		mutationFn() {
+			return generateGist(indexID, videoID, [GistType.HASHTAG])
+		},
+		onSuccess() {
+			queryClient.invalidateQueries({ queryKey: ['video', indexID, videoID] })
+		},
+		onError(error) {
+			if (error.status === 429) {
+				toast('Daily generate usage exceeded 😢')
+			}
+		}
+	})
+
 	return (
 		<Section title="Generate hashtags">
 			<form onSubmit={handleSubmit(onSubmit)}>
@@ -34,11 +54,28 @@ export default function HashtagsControl({ indexID, videoID }: Props) {
 						description="Write prompt for describe criterions of hashtags."
 						errorMessage={errors.hashtag_prompt?.message}
 					/>
-					<Button fullWidth type="submit" color="default" isDisabled={!isValid} isLoading={generateHashtags.isPending}>
+					<Button
+						fullWidth
+						type="submit"
+						color="default"
+						isDisabled={!isValid || reset.isPending}
+						isLoading={generateHashtags.isPending}
+					>
 						Generate
 					</Button>
 				</div>
 			</form>
+			<Button
+				fullWidth
+				type="button"
+				color="warning"
+				className="mt-2"
+				onClick={() => reset.mutate()}
+				isDisabled={generateHashtags.isPending}
+				isLoading={reset.isPending}
+			>
+				Reset hashtags
+			</Button>
 		</Section>
 	)
 }

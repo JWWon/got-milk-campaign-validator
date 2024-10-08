@@ -7,6 +7,7 @@ import useVideo from '@/app/hooks/useVideo'
 import type { AxiosError } from 'axios'
 import { type IndexID, type VideoID } from '@/networks'
 import generateGist from '../_actions/generateGist'
+import { GistType } from '@/networks/request/generate/types'
 
 export default function useGenerateGist(indexID: IndexID, videoID: VideoID) {
 	const queryClient = useQueryClient()
@@ -15,7 +16,7 @@ export default function useGenerateGist(indexID: IndexID, videoID: VideoID) {
 
 	const generateGistMutation = useMutation<void, AxiosError>({
 		mutationFn() {
-			return generateGist(indexID, videoID)
+			return generateGist(indexID, videoID, [GistType.HASHTAG, GistType.TOPIC])
 		},
 		onSuccess() {
 			queryClient.invalidateQueries({ queryKey: ['video', indexID, videoID] })
