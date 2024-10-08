@@ -3,11 +3,11 @@
 import { useSelectedVideoStore } from '@/app/utils/selectedVideoStore'
 import useVideos from './_hooks/useVideos'
 import { useShallow } from 'zustand/react/shallow'
-import { useInfiniteScroll } from '@nextui-org/use-infinite-scroll'
 import VideoItem from './_components/VideoItem'
 import VideoItemSkeleton from './_components/VideoItemSkeleton'
-import { RefObject, Suspense } from 'react'
+import { Suspense } from 'react'
 import { twMerge } from 'tailwind-merge'
+import { useInView } from 'react-intersection-observer'
 import type { IndexID } from '@/networks'
 
 interface InternalProps {
@@ -24,11 +24,12 @@ function VideoSelect({ indexID }: InternalProps) {
 
 	const { data: videos, hasNextPage, fetchNextPage } = useVideos(indexID)
 
-	const [loaderRef] = useInfiniteScroll({
-		hasMore: hasNextPage,
-		isEnabled: true,
-		shouldUseLoader: true,
-		onLoadMore: fetchNextPage
+	const { ref: loaderRef } = useInView({
+		rootMargin: '200px',
+		onChange(inView) {
+			if (!inView || !hasNextPage) return
+			fetchNextPage()
+		}
 	})
 
 	return (
@@ -46,7 +47,7 @@ function VideoSelect({ indexID }: InternalProps) {
 					</Suspense>
 				)
 			})}
-			{hasNextPage && <VideoItemSkeleton ref={loaderRef as RefObject<HTMLDivElement>} />}
+			{hasNextPage && <VideoItemSkeleton ref={loaderRef} />}
 		</div>
 	)
 }
