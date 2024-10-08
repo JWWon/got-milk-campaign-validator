@@ -1,3 +1,5 @@
+'use client'
+
 import { generate, IndexID, updateVideo, VideoID } from '@/networks'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
@@ -5,9 +7,11 @@ import { toast } from 'react-toastify'
 
 const promptWithFormatGuide = (prompt: string) => `${prompt}
 
-Print the 10 hashtags with following array format without any additional description like below.
+Generate an array of 10 hashtags based on its definition with following format:
 
 ["hashtag1", "hashtag2", "hashtag3"]
+
+No additional comment is needed.
 `
 
 export default function useGenerateHashtags(indexID: IndexID, videoID: VideoID) {
@@ -20,13 +24,26 @@ export default function useGenerateHashtags(indexID: IndexID, videoID: VideoID) 
 				data: { data: text }
 			} = await generate({ video_id: videoID, prompt: promptWithFormatGuide(prompt) })
 			console.log({ hashtags: text })
-			const response: string[] = JSON.parse(text)
 
-			if (!Array.isArray(response)) {
-				throw new Error('Invalid hashtags response')
+			try {
+				const response: string[] = JSON.parse(text)
+
+				if (!Array.isArray(response)) {
+					toast.error(`Invalid hashtags response: "${text}"`)
+					throw new Error('Invalid hashtags response')
+				}
+
+				return response
+			} catch (e) {
+				if (e instanceof Error) {
+					if (e instanceof SyntaxError) {
+						toast.error(`Invalid generate response: "${text}"`)
+					}
+					throw e
+				}
+
+				return []
 			}
-
-			return response
 		},
 		async onSuccess(hashtags) {
 			await updateVideo(indexID, videoID, {

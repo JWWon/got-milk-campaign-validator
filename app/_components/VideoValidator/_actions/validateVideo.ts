@@ -15,7 +15,7 @@ export interface ValidateVideoResponse {
 
 const promptWithFormatGuide = (prompt: string) => `${prompt}
 
-Print the response with following JSON format below.
+Generate a stringified JSON object that contains the following format:
 
 {
   "matched": true|false,
@@ -47,14 +47,23 @@ export default async function validateVideo(
 			data: { data: text }
 		} = await generate({ video_id: videoID, prompt: promptWithFormatGuide(data.prompt) })
 		console.log({ generate: text })
-		const response: ValidateVideoResponse = JSON.parse(text)
 
-		if ('matched' in response && !response.matched) {
-			return response
-		}
+		try {
+			const response: ValidateVideoResponse = JSON.parse(text)
+			if ('matched' in response && !response.matched) {
+				return response
+			}
 
-		if (typeof response.description === 'string') {
-			description = response.description
+			if (typeof response.description === 'string') {
+				description = response.description
+			}
+		} catch (e) {
+			if (e instanceof Error) {
+				if (e instanceof SyntaxError) {
+					console.error(e)
+				}
+				throw e
+			}
 		}
 	}
 
