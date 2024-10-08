@@ -20,24 +20,22 @@ export default function useGenerateHashtags(indexID: IndexID, videoID: VideoID) 
 	return useMutation<string[], AxiosError, string>({
 		mutationKey: ['hashtags', indexID, videoID],
 		async mutationFn(prompt) {
-			const {
-				data: { data: text }
-			} = await generate({ video_id: videoID, prompt: promptWithFormatGuide(prompt) })
+			const { data: text } = await generate({ video_id: videoID, prompt: promptWithFormatGuide(prompt) }).then(
+				({ data }) => data
+			)
 			console.log({ hashtags: text })
 
 			try {
 				const response: string[] = JSON.parse(text)
-
 				if (!Array.isArray(response)) {
-					toast.error(`Invalid hashtags response: "${text}"`)
-					throw new Error('Invalid hashtags response')
+					throw new SyntaxError('Invalid hashtags response')
 				}
 
 				return response
 			} catch (e) {
 				if (e instanceof Error) {
 					if (e instanceof SyntaxError) {
-						toast.error(`Invalid generate response: "${text}"`)
+						toast.error(`Invalid hashtags response: "${text}"`)
 					}
 					throw e
 				}
