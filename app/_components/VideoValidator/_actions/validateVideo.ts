@@ -61,7 +61,7 @@ export default async function validateVideo(
 	if (data.queries?.length) {
 		try {
 			console.log({ queries: data.queries })
-			await Promise.all(
+			const results = await Promise.all(
 				data.queries.map(async (query) => {
 					const { data } = await search({
 						index_id: indexID,
@@ -73,8 +73,10 @@ export default async function validateVideo(
 					if (data.page_info.total_results < 1) {
 						throw new ValidateWithSearchError({ query, videoID })
 					}
+					return { query, matches: data.page_info.total_results }
 				})
 			)
+			description = results.map(({ query, matches }) => `- ${matches} matches for query "${query}"`).join('\n')
 		} catch (err) {
 			if (err instanceof ValidateWithSearchError) {
 				return { matched: false, description: `Query "${err.query}" is not matched to the video ${err.videoID}.` }

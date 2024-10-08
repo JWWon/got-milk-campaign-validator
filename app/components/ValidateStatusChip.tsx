@@ -17,7 +17,7 @@ export default function ValidateStatusChip({ metadata, ...chipProps }: Props) {
 					content={
 						<div className="max-w-80 px-1 py-2">
 							<p className="text-medium font-bold">Description</p>
-							<p className="w-full text-small">{metadata[VALIDATE_DESCRIPTION_KEY]}</p>
+							<p className="w-full whitespace-pre-wrap text-small">{metadata[VALIDATE_DESCRIPTION_KEY]}</p>
 						</div>
 					}
 				>

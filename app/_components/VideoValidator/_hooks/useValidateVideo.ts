@@ -12,7 +12,7 @@ export default function useValidateVideo(indexID: IndexID, videoID: VideoID) {
 		async mutationFn(data) {
 			// Cleanup previous validate state
 			await updateVideo(indexID, videoID, {
-				metadata: { [VALIDATE_STATUS_KEY]: undefined, [VALIDATE_DESCRIPTION_KEY]: undefined }
+				metadata: { [VALIDATE_STATUS_KEY]: '', [VALIDATE_DESCRIPTION_KEY]: '' }
 			})
 			await queryClient.invalidateQueries({ queryKey: ['video', indexID, videoID] })
 
