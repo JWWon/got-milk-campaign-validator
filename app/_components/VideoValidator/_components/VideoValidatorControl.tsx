@@ -38,7 +38,7 @@ export default function VideoValidatorControl({ indexID, video }: Props) {
 		}
 		return validateVideo.mutateAsync({
 			prompt: use_prompt ? prompt : undefined,
-			queries: use_queries ? queries?.replace(', ', ',').split(',') : undefined
+			queries: use_queries ? queries?.split(/,[,\s]*/g) : undefined
 		})
 	}
 

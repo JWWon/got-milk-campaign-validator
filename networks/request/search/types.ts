@@ -58,7 +58,7 @@ interface SearchParamsBase {
 	 */
 	sort_option?: 'score' | 'hits'
 	/**
-	 * @default DEFAULT_ADJUST_CONFIDENCE_LEVEL
+	 * @default 0.5
 	 */
 	adjust_confidence_level?: number
 	/**
@@ -75,7 +75,11 @@ interface SearchParamsBase {
 	conversation_option?: ConversationOption
 }
 
-export type SearchParams = SearchParamsBase &
+export interface SearchParams extends SearchParamsBase {
+	query: string
+}
+
+export type SearchV2Params = SearchParamsBase &
 	(
 		| {
 				/**
@@ -142,7 +146,6 @@ export interface SearchResponseGroupByClip {
 		limit_per_page: number
 		total_results: number
 		page_expired_at: string
-		prev_page_token?: PageToken
 		next_page_token?: PageToken
 	}
 	search_pool: {
@@ -156,7 +159,11 @@ export interface SearchResponseGroupByClip {
 export interface SearchResponseGroupByVideo {
 	data: SearchResponse[]
 	page_info: {
+		limit_per_page: number
+		total_results: number
+		page_expired_at: string
 		total_inner_matches: number
+		next_page_token?: PageToken
 	}
 	search_pool: {
 		index_id: string

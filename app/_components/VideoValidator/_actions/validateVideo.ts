@@ -24,14 +24,11 @@ Generate a stringified JSON object that contains the following format:
 `
 
 class ValidateWithSearchError extends Error {
-	readonly query: string
+	readonly matchedQueries: string[] | undefined
 
-	readonly videoID: VideoID
-
-	constructor({ query, videoID }: { query: string; videoID: VideoID }) {
+	constructor({ matchedQueries }: { matchedQueries?: string[] }) {
 		super('Video is not matched to query')
-		this.query = query
-		this.videoID = videoID
+		this.matchedQueries = matchedQueries
 	}
 }
 
@@ -74,22 +71,31 @@ export default async function validateVideo(
 			const results = await Promise.all(
 				data.queries.map(async (query) => {
 					const { data } = await search({
+						query,
 						index_id: indexID,
-						query_text: query,
 						threshold: Confidence.HIGH,
-						search_options: Object.values(EngineOption)
-						// filter: { id: [videoID] } // TODO: Uncomment this line after fixing 'filter' field in search request
+						search_options: Object.values(EngineOption),
+						filter: { id: [videoID] }
 					})
-					if (data.page_info.total_results < 1) {
-						throw new ValidateWithSearchError({ query, videoID })
-					}
 					return { query, matches: data.page_info.total_results }
 				})
 			)
-			description = results.map(({ query, matches }) => `- ${matches} matches for query "${query}"`).join('\n')
+
+			const matchedResults = results.filter(({ matches }) => matches > 0)
+			const matchThreshold = Math.min(3, data.queries.length)
+			if (matchedResults.length >= matchThreshold) {
+				description = matchedResults.map(({ query, matches }) => `- ${matches} matches for "${query}"`).join('\n')
+			} else {
+				throw new ValidateWithSearchError({ matchedQueries: matchedResults.map(({ query }) => query) })
+			}
 		} catch (err) {
 			if (err instanceof ValidateWithSearchError) {
-				return { matched: false, description: `Query "${err.query}" is not matched to the video ${err.videoID}.` }
+				return {
+					matched: false,
+					description: err.matchedQueries?.length
+						? `Only ${err.matchedQueries.length} queries are matched\n${err.matchedQueries.map((query) => `- "${query}"`).join('\n')}`
+						: 'No queries were matched to this video'
+				}
 			}
 			throw err
 		}
