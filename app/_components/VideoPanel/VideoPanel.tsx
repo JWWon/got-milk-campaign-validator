@@ -4,7 +4,7 @@ import { useSelectedData } from '@/app/utils/selectedVideoStore'
 import { Suspense } from 'react'
 import ReactPlayer from 'react-player'
 import { formatDistance } from 'date-fns'
-import VideoValidatorSkeleton from './_components/VideoValidatorSkeleton'
+import VideoValidatorSkeleton from './_components/VideoPanelSkeleton'
 import HorizontalList from '@/app/components/HorizontalList'
 import formatTimestamp from '@/app/utils/formatTimestamp'
 import useGenerateGist from './_hooks/useGenerateGist'
@@ -21,7 +21,7 @@ interface Props {
 	videoID: VideoID
 }
 
-function VideoValidator({ indexID, videoID }: Props) {
+function VideoPanel({ indexID, videoID }: Props) {
 	const { data: video } = useVideo(indexID, videoID)
 	const { isPending: isPendingGist } = useGenerateGist(indexID, videoID)
 	const hashtagStates = useMutationState({
@@ -58,13 +58,13 @@ function VideoValidator({ indexID, videoID }: Props) {
 	)
 }
 
-export default function ValidatorWithFallback() {
+export default function VideoPanelWithFallback() {
 	const { indexID, videoID } = useSelectedData()
 
 	if (!indexID || !videoID) {
 		return (
 			<div className="flex h-full w-full items-center justify-center">
-				<p>Please select video to validate 🥺</p>
+				<p>Select video to see details 🥺</p>
 			</div>
 		)
 	}
@@ -72,7 +72,7 @@ export default function ValidatorWithFallback() {
 	return (
 		<div className="h-full w-full rounded-medium border border-gray-100 p-6 shadow-lg shadow-gray-400/30 dark:bg-gray-700/20 dark:shadow-white/20">
 			<Suspense fallback={<VideoValidatorSkeleton />}>
-				<VideoValidator indexID={indexID} videoID={videoID} />
+				<VideoPanel indexID={indexID} videoID={videoID} />
 			</Suspense>
 		</div>
 	)
