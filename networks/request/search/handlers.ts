@@ -9,12 +9,12 @@ import type {
 	SearchParams
 } from './types'
 
-export async function search<T extends GroupBy = GroupBy.clip>(
-	data: SearchParams | PageToken,
+export async function search<G extends GroupBy = GroupBy.clip>(
+	data: SearchParams<G> | PageToken,
 	config?: AxiosRequestConfig
 ) {
 	const isDataPageToken = typeof data === 'string'
-	return getTwelveLabsAPI().request<T extends GroupBy.clip ? SearchResponseGroupByClip : SearchResponseGroupByVideo>({
+	return getTwelveLabsAPI().request<G extends GroupBy.clip ? SearchResponseGroupByClip : SearchResponseGroupByVideo>({
 		...config,
 		method: isDataPageToken ? 'GET' : 'POST',
 		url: isDataPageToken ? `/search/${data}` : '/search',
@@ -22,8 +22,8 @@ export async function search<T extends GroupBy = GroupBy.clip>(
 	})
 }
 
-export async function searchV2<T extends GroupBy = GroupBy.clip>(
-	data: SearchV2Params | PageToken,
+export async function searchV2<G extends GroupBy = GroupBy.clip>(
+	data: SearchV2Params<G> | PageToken,
 	config?: AxiosRequestConfig
 ) {
 	const formData = new FormData()
@@ -54,7 +54,7 @@ export async function searchV2<T extends GroupBy = GroupBy.clip>(
 	}
 
 	const isDataPageToken = typeof data === 'string'
-	return getTwelveLabsAPI().request<T extends GroupBy.clip ? SearchResponseGroupByClip : SearchResponseGroupByVideo>({
+	return getTwelveLabsAPI().request<G extends GroupBy.clip ? SearchResponseGroupByClip : SearchResponseGroupByVideo>({
 		...config,
 		method: isDataPageToken ? 'GET' : 'POST',
 		url: isDataPageToken ? `/search-v2/${data}` : '/search-v2',

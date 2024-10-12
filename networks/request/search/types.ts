@@ -1,4 +1,4 @@
-import type { Engine, EngineOption, IndexID } from '../../schema'
+import type { Engine, EngineOption, IndexID, VideoID } from '../../schema'
 
 export enum Confidence {
 	HIGH = 'high',
@@ -17,7 +17,7 @@ export enum ConversationOption {
 	EXACT_MATCH = 'exact_match'
 }
 
-interface SearchParamsBase {
+interface SearchParamsBase<G extends GroupBy> {
 	index_id: IndexID
 	filter?: {
 		/**
@@ -44,7 +44,7 @@ interface SearchParamsBase {
 	/**
 	 * @default 'clip'
 	 */
-	group_by?: GroupBy
+	group_by?: G
 	/**
 	 * @default 10
 	 */
@@ -75,11 +75,11 @@ interface SearchParamsBase {
 	conversation_option?: ConversationOption
 }
 
-export interface SearchParams extends SearchParamsBase {
+export interface SearchParams<G extends GroupBy> extends SearchParamsBase<G> {
 	query: string
 }
 
-export type SearchV2Params = SearchParamsBase &
+export type SearchV2Params<G extends GroupBy> = SearchParamsBase<G> &
 	(
 		| {
 				/**
@@ -126,7 +126,7 @@ export interface SearchResponse {
 		range?: { Gte: number; Lte: number }
 		raw_score?: number
 	}[]
-	video_id: string
+	video_id: VideoID
 	confidence: Confidence
 	/**
 	 * This field will be returned when `thumbnail` search option is set
@@ -157,7 +157,10 @@ export interface SearchResponseGroupByClip {
 }
 
 export interface SearchResponseGroupByVideo {
-	data: SearchResponse[]
+	data: {
+		id: VideoID
+		clips: SearchResponse[]
+	}[]
 	page_info: {
 		limit_per_page: number
 		total_results: number
