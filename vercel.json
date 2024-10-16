@@ -1,0 +1,7 @@
+{
+	"functions": {
+		"app/**/_actions/*": {
+			"maxDuration": 60
+		}
+	}
+}
