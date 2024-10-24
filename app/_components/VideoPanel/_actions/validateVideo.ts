@@ -40,9 +40,10 @@ export default async function validateVideo(
 	let description = ''
 
 	if (!!data.prompt) {
-		const { data: rawText } = await generate({ video_id: videoID, prompt: promptWithFormatGuide(data.prompt) }).then(
-			({ data }) => data
-		)
+		const { data: rawText } = await generate(
+			{ video_id: videoID, prompt: promptWithFormatGuide(data.prompt) },
+			{ timeout: 60000 }
+		).then(({ data }) => data)
 		const refinedText = rawText.replace(/(`+|json|\n)/g, '')
 		console.log({ generate: refinedText })
 
